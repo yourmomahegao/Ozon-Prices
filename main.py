@@ -138,9 +138,6 @@ CREATE TABLE IF NOT EXISTS last_links(
                 self.ui.product_prices.addItem(item)
 
     def updateName(self):
-        with open('index.html', mode='w', encoding='utf-8') as f:
-            f.write(self.product_html)
-
         soup = BeautifulSoup(self.product_html, features="html.parser")
         name = soup.find("div", {"data-widget": "webProductHeading"})
         name = name.find("h1").text
@@ -177,7 +174,7 @@ CREATE TABLE IF NOT EXISTS last_links(
         soup = BeautifulSoup(self.product_html, features="html.parser")
         gallery = soup.find("div", {"data-widget": "webGallery"})
         image = gallery.find("img")['src']
-        image_path = f'product_image.{image.split(".")[-1]}'
+        image_path = f'{tempfile.gettempdir()}\\ozon_prices_product_image.{image.split(".")[-1]}'
 
         urllib.request.urlretrieve(image, image_path)
 
