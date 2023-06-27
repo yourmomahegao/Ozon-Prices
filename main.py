@@ -7,10 +7,11 @@ import threading
 import time
 import urllib.request
 import undetected_chromedriver as uc
+import tempfile
 
 from PyQt5 import QtCore, QtWidgets
 from PyQt5.Qt import Qt
-from PyQt5.QtGui import QIcon, QPixmap
+from PyQt5.QtGui import QIcon, QPixmap, QFontDatabase, QFont
 from bs4 import BeautifulSoup
 
 from ui import Ui_MainWindow
@@ -23,6 +24,10 @@ class ProgramUI(QtWidgets.QMainWindow):
         # Lock ui initialization
         self.ui = Ui_MainWindow()
         self.ui.setupUi(self)
+
+        # Fonts
+        self.fontDB = QFontDatabase()
+        self.fontDB.addApplicationFont(":/fonts/fonts/Montserrat-ExtraBold.ttf")
 
         # Scrapper
         self.scraper = uc.Chrome()
@@ -42,7 +47,7 @@ class ProgramUI(QtWidgets.QMainWindow):
                 d[col[0]] = row[idx]
             return d
 
-        self.sql = sqlite3.connect('db.db', check_same_thread=False)
+        self.sql = sqlite3.connect(f'{tempfile.gettempdir()}\\ozon_prices.db', check_same_thread=False)
         self.sql.row_factory = dict_factory
         self.cursor = self.sql.cursor()
 
