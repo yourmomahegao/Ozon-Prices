@@ -21,17 +21,14 @@ class ProgramUI(QtWidgets.QMainWindow):
     def __init__(self):
         super(ProgramUI, self).__init__()
 
-        # Lock ui initialization
+        # Ui initialization
+        self.scraper = None
         self.ui = Ui_MainWindow()
         self.ui.setupUi(self)
 
         # Fonts
         self.fontDB = QFontDatabase()
         self.fontDB.addApplicationFont(":/fonts/fonts/Montserrat-ExtraBold.ttf")
-
-        # Scrapper
-        self.scraper = uc.Chrome()
-        self.scraper.minimize_window()
 
         self.isWindowDragging = False
         self.cursor_position = None
@@ -112,14 +109,22 @@ CREATE TABLE IF NOT EXISTS last_links(
         self.isWindowDragging = False
 
     def closeAll(self):
-        self.scraper.close()
-        self.scraper.quit()
+        try:
+            self.scraper.close()
+            self.scraper.quit()
+        except Exception:
+            pass
+
         self.close()
 
     def scrapeWebPage(self, url):
+        self.scraper = uc.Chrome()
+        self.scraper.minimize_window()
         self.scraper.get(url)
         time.sleep(3)
         self.product_html = self.scraper.page_source
+        self.scraper.close()
+        self.scraper.quit()
 
     def updatePricesDynamic(self):
         try:
@@ -132,6 +137,8 @@ CREATE TABLE IF NOT EXISTS last_links(
         except Exception:
             pass
         else:
+            self.ui.product_prices.clear()
+
             for price in prices:
                 dt = datetime.datetime.fromtimestamp(price["unix_datetime"])
                 item = f'[{dt.strftime("%d.%m.%Y %H:%M:%S")}] {price["value"]}₽'
@@ -203,7 +210,6 @@ CREATE TABLE IF NOT EXISTS last_links(
     def updateProductInfo(self):
         try:
             url = self.ui.product_link.text()
-            self.saveLink(url)
             self.scrapeWebPage(url)
 
             self.updateName()
@@ -212,6 +218,7 @@ CREATE TABLE IF NOT EXISTS last_links(
             self.updatePrice()
             self.updateImage()
 
+            self.saveLink(self.ui.product_link.text())
         except Exception as e:
             self.ui.product_name.setText(str(e))
 
