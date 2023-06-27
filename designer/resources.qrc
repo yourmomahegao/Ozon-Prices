@@ -1,0 +1,9 @@
+<RCC>
+  <qresource prefix="fonts">
+    <file>fonts/Montserrat-ExtraBold.ttf</file>
+  </qresource>
+  <qresource prefix="icons">
+    <file>icons/ozon.ico</file>
+    <file>icons/ozon.png</file>
+  </qresource>
+</RCC>
